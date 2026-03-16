@@ -1,0 +1,37 @@
+services:
+  db:
+    image: postgres:16
+    container_name: database
+    env_file:
+      - config.env
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+  
+  migrate:
+    build: .
+    depends_on:
+      - db
+    env_file:
+      - config.env
+    entrypoint:
+      - sh
+      - -c
+      - export DATABASE_URL="host=db user=$$POSTGRES_USER password=$$POSTGRES_PASSWORD dbname=$$POSTGRES_DB port=5432 sslmode=disable" && goose -dir /app/migration postgres "$$DATABASE_URL" "$$@"
+      - --
+  app:
+    build: .
+    depends_on:
+      - db
+    env_file:
+      - config.env
+    entrypoint:
+      - sh
+      - -c
+      - export DATABASE_URL="host=db user=$$POSTGRES_USER password=$$POSTGRES_PASSWORD dbname=$$POSTGRES_DB port=5432 sslmode=disable" && exec ./wallet-app
+    ports:
+      - "9091:9091"
+
+volumes:
+  postgres_data:
