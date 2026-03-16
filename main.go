@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 	httphandlers "test_project/httpHandlers"
@@ -26,7 +25,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	} else {
-		fmt.Println("Соединение успешно установлено")
+		log.Printf("Соединение успешно установлено")
 	}
 	sqlDB, err := db.DB()
 	if err != nil {

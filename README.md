@@ -18,7 +18,7 @@ REST API для управления балансом кошелька.
 
 Проект читает переменные окружения из `config.env`.
 
-Пример файла лежит в [config.env.example].
+Пример файла лежит в config.env.example.
 
 Основные переменные:
 - `PORT`
@@ -28,14 +28,14 @@ REST API для управления балансом кошелька.
 - `POSTGRES_PORT`
 - `DATABASE_URL`
 
-Для локального запуска создай `config.env` на основе `config.env.example`.
+Для локального запуска создать `config.env` на основе `config.env.example`.
 
 ## Локальный запуск
 
-1. Подними PostgreSQL локально или через Docker.
-2. Создай `config.env`.
-3. Прогони миграции.
-4. Запусти приложение.
+1. Поднять PostgreSQL локально или через Docker.
+2. Создать `config.env`.
+3. Прогнать миграции.
+4. Запустить приложение.
 
 Пример команд:
 
@@ -47,20 +47,20 @@ go run main.go
 
 ## Запуск через Docker Compose
 
-1. Создай локальный `config.env`.
-2. Подними БД:
+1. Создать локальный `config.env`.
+2. Поднять БД:
 
 ```bash
 docker compose up -d db
 ```
 
-3. Прогони миграции:
+3. Прогнать миграции:
 
 ```bash
 docker compose run --rm migrate up
 ```
 
-4. Подними приложение:
+4. Поднять приложение:
 
 ```bash
 docker compose up -d app
@@ -152,10 +152,16 @@ go test ./httpHandlers
 
 Для ручной проверки нагрузки использовался `hey`.
 
+Сценарий:
+- все запросы отправлялись на один и тот же `walletId`
+- использовался `POST /api/v1/wallet`
+- операция: `deposit`
+- сумма: `1`
+
 Пример:
 
 ```bash
-hey -n 5000 -c 200 -m POST -H "Content-Type: application/json" -D body.json http://localhost:9091/api/v1/wallet
+hey -n 20000 -c 250 -m POST -H "Content-Type: application/json" -D body.json http://localhost:9091/api/v1/wallet
 ```
 
 `body.json`:
@@ -167,5 +173,12 @@ hey -n 5000 -c 200 -m POST -H "Content-Type: application/json" -D body.json http
   "amount": 1
 }
 ```
+Результат одного из прогонов:
 
-При нагрузочном тестировании отдельно проверялся итоговый баланс кошелька после серии успешных запросов.
+- 20000 / 20000 ответов с кодом 200
+- 0 ответов 5xx
+- 4221 RPS
+- Средняя продолжительность: 55.9 ms
+
+После нагрузочного прогона дополнительно проверялся итоговый баланс кошелька.
+Баланс соответствовал числу успешно обработанных запросов.
